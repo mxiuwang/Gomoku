@@ -7,17 +7,33 @@ class Board:
             row = []
             for col in range(cols):
                 row.append(".")
-            self.__board.append(row) 
-        self.winner = 'T' # can be X, O or T 
+            self.__board.append(row)
+        self.__winner = 'T' # can be X, O or T
 
-    def get_board(self):
+    def getBoard(self):
         return self.__board
 
-    def print_board(self):
+    def printBoard(self):
+        if self.__rows > 10:
+            print(end='   ')
+        else:
+            print(end='  ')
+
+        for i in range(self.__cols):
+            print(i, end=' ')
+
         for row in range(self.__rows):
+            if self.__rows > 10:
+                print('\n%-2d' % row, end=' ')
+            else:
+                print('\n%d' % row, end=' ')
             for col in range(self.__cols):
-                print(self.__board[row][col], end=' ')
-            print()
+                if col < 10:
+                    print(self.__board[row][col], end=' ')
+                else:
+                    print(self.__board[row][col], end='  ')
+
+        print('\n')
 
     def get_color(self, row, col):
         return self.__board[row][col]
@@ -26,55 +42,58 @@ class Board:
         self.__board[row][col] = color
 
     def positionIsValid(self, row, col):
-        valid = False 
-        if self.__board[row][col] == ".":
-          valid = True 
-          return valid              
-        return valid    
+        if row<0 or row>=self.__rows or col<0 or col>=self.__cols:
+            return False
+        return self.__board[row][col] == "."
 
     def getWinner(self):
-        return self.winner 
+        return self.__winner
 
     def isGameOver(self):
-        
-        # check if there's 5 in a row 
+
+        # check if there's 5 in a row
         for row in range(self.__rows):
             for col in range(self.__cols-4):
                 if self.__board[row][col] == self.__board[row][col+1] == self.__board[row][col+2] == self.__board[row][col+3] == self.__board[row][col+4] != '.':
-                    self.winner = self.__board[row][col]
-                    return True 
+                    self.__winner = self.__board[row][col]
+                    return True
 
-        # check if there's 5 in a column 
+        # check if there's 5 in a column
         for col in range(self.__cols):
             for row in range(self.__rows-4):
                 if self.__board[row][col] == self.__board[row+1][col] == self.__board[row+2][col] == self.__board[row+3][col] == self.__board[row+4][col] != '.':
-                    self.winner = self.__board[row][col]
-                    return True 
+                    self.__winner = self.__board[row][col]
+                    return True
 
-        # check if there's 5 in diagonal 
+        # check if there's 5 in diagonal
+        # From left top to right bottom
         for row in range(self.__rows-4):
             for col in range(self.__cols-4):
                 if self.__board[row][col] == self.__board[row+1][col+1] == self.__board[row+2][col+2] == self.__board[row+3][col+3] == self.__board[row+4][col+4] != '.':
-                    self.winner = self.__board[row][col]
-                    return True 
-                    
+                    self.__winner = self.__board[row][col]
+                    return True
+
+        # From right top to left bottom
         for row in range(self.__rows-4):
             for col in range(4, self.__cols):
                 if self.__board[row][col] == self.__board[row+1][col-1] == self.__board[row+2][col-2] == self.__board[row+3][col-3] == self.__board[row+4][col-4] != '.':
-                    self.winner = self.__board[row][col]
+                    self.__winner = self.__board[row][col]
                     return True
 
-        # check if board is full 
-        fullBoard = True 
+        # check if board is full
+        fullBoard = True
         for row in range(self.__rows):
             for col in range(self.__cols):
                 if self.__board[row][col] == '.':
-                    fullBoard = False 
+                    fullBoard = False
         if fullBoard == True:
-            self.winner = 'T'
-            return True 
+            self.__winner = 'T'
+            return True
 
         return False
+
+def absearchthing(board):
+    return [0, 0]
 
 class Player:
 
@@ -94,10 +113,30 @@ class Player:
         return row, col
 
     def askMove(self, board):
-        print()
-        move = input("Enter move: ")
+        move = input("\nEnter move: ")
+        if len(move) >= 3:
+            row, col = move.split(" ")
+            try:
+                row = int(row)
+                col = int(col)
+            except:
+                row = 100
+                col = 100
+        else:
+            row = 100
+            col = 100
 
-        row, col = move.split(" ")
+        while board.positionIsValid(row, col) == False:
+            print("Invalid move")
+            move = input("\nEnter move: ")
+            if len(move) >= 3:
+                row, col = move.split(" ")
+                try:
+                    row = int(row)
+                    col = int(col)
+                except:
+                    row = 100
+                    col = 100
 
         print()
         return int(row), int(col)
@@ -106,18 +145,22 @@ def get_input():
     valid = False
     while not valid:
         print("Enter size of board")
-        rows = int(input("Enter number of rows (5-100): "))
-        cols = int(input("Enter number of cols (5-100): "))
-        if rows >= 5 and rows <= 100 and cols >= 5 and cols <= 100:
-            valid = True
-            board = Board(rows, cols)
-        else:
+        try:
+            rows = int(input("Enter number of rows (5-99): "))
+            cols = int(input("Enter number of cols (5-99): "))
+        except:
             print("Invalid input, try again")
+        else:
+            if rows >= 5 and rows <= 99 and cols >= 5 and cols <= 99:
+                valid = True
+                board = Board(rows, cols)
+            else:
+                print("Invalid input, try again")
         print()
 
     valid = False
     while not valid:
-        option = input("Enter game mode 1,2,3(1 = player vs player, 2 = player vs ai, 3 = ai vs ai): ")
+        option = input("Enter game mode 1,2,3 (1 = player vs player, 2 = player vs ai, 3 = ai vs ai): ")
         if option in ["1", "2", "3"]:
             valid = True
             player1 = Player("X", option != "3")
@@ -153,8 +196,8 @@ class Game:
     def play(self):
         current = "Player 1"
         current_player = self.player1
+        self.board.printBoard()
         while not self.board.isGameOver():
-            self.board.print_board()
             print("{0} to make move".format(current))
             current_player.makeMove(self.board)
             #winner = self.board.winner()
@@ -164,8 +207,9 @@ class Game:
             else:
                 current_player = self.player1
                 current = "Player 1"
+            self.board.printBoard()
 
-        winner = self.board.getWinner() # X, O, or T       
+        winner = self.board.getWinner() # X, O, or T
         return winner
 
 def main():
