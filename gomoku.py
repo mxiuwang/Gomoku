@@ -120,11 +120,11 @@ class Player:
                 row = int(row)
                 col = int(col)
             except:
-                row = 100
-                col = 100
+                row = 101
+                col = 101
         else:
-            row = 100
-            col = 100
+            row = 101
+            col = 101
 
         while board.positionIsValid(row, col) == False:
             print("Invalid move")
@@ -135,8 +135,8 @@ class Player:
                     row = int(row)
                     col = int(col)
                 except:
-                    row = 100
-                    col = 100
+                    row = 101
+                    col = 101
 
         print()
         return int(row), int(col)
