@@ -212,11 +212,9 @@ class Game:
         winner = self.board.getWinner() # X, O, or T
         return winner
 
-def main():
+if __name__ == "__main__":
     board, player1, player2 = get_input()
 
     game = Game(board, player1, player2)
     winner = game.play()
     print("The Winner is", winner)
-
-main()
