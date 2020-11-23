@@ -146,12 +146,12 @@ def get_input():
     while not valid:
         print("Enter size of board")
         try:
-            rows = int(input("Enter number of rows (5-99): "))
-            cols = int(input("Enter number of cols (5-99): "))
+            rows = int(input("Enter number of rows (5-100): "))
+            cols = int(input("Enter number of cols (5-100): "))
         except:
             print("Invalid input, try again")
         else:
-            if rows >= 5 and rows <= 99 and cols >= 5 and cols <= 99:
+            if rows >= 5 and rows <= 100 and cols >= 5 and cols <= 100:
                 valid = True
                 board = Board(rows, cols)
             else:
