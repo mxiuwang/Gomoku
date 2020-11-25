@@ -8,6 +8,7 @@ SCORES = {
 }
 
 class Board:
+
     def __init__(self, rows, cols):
         self.__rows = rows
         self.__cols = cols
@@ -146,7 +147,7 @@ def minimax(board, depth, isMaximizing, color):
                     score = minimax(board, depth+1, False, color)
                     if score > bestScore:
                         bestScore = score 
-        print("Maximizing", bestScore)
+        # print("Maximizing", bestScore)
         return bestScore
 
     else: # isMaximizing is False 
@@ -162,7 +163,7 @@ def minimax(board, depth, isMaximizing, color):
                     score = minimax(board, depth+1, True, color)
                     if score < bestScore:
                         bestScore = score 
-        print("Minimizing", bestScore)
+        # print("Minimizing", bestScore)
         return bestScore
 
     return bestScore
@@ -190,15 +191,11 @@ class Player:
             print("Thank you for playing")
             exit()
 
-        if len(move) >= 3:
+        try:
             row, col = move.split(" ")
-            try:
-                row = int(row)
-                col = int(col)
-            except:
-                row = 101
-                col = 101
-        else:
+            row = int(row)
+            col = int(col)
+        except:
             row = 101
             col = 101
 
@@ -208,14 +205,13 @@ class Player:
             if move == 'q':
                 print("Thank you for playing")
                 exit()
-            if len(move) >= 3:
+            try:
                 row, col = move.split(" ")
-                try:
-                    row = int(row)
-                    col = int(col)
-                except:
-                    row = 101
-                    col = 101
+                row = int(row)
+                col = int(col)
+            except:
+                row = 101
+                col = 101
 
         print()
         return int(row), int(col)
@@ -273,9 +269,8 @@ def get_input():
                 valid = True
             elif player == "2":
                 valid = True
-                current = player1
-                player1 = player2
-                player2 = current
+                player1 = Player("X", False)
+                player2 = Player("O", True)
             else:
                 print("Invalid input, try again")
             print()
