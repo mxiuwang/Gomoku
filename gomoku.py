@@ -185,7 +185,7 @@ class Player:
         return row, col
 
     def askMove(self, board):
-        move = input("\nEnter move: ")
+        move = input("\nEnter move [row col]: ")
         if move == 'q':
             print("Thank you for playing")
             exit()
@@ -204,7 +204,7 @@ class Player:
 
         while board.positionIsValid(row, col) == False:
             print("Invalid move")
-            move = input("\nEnter move: ")
+            move = input("\nEnter move [row col]: ")
             if move == 'q':
                 print("Thank you for playing")
                 exit()
@@ -221,9 +221,9 @@ class Player:
         return int(row), int(col)
 
 def get_input():
+    print("Welcome to Gomoku (Enter 'q' to quit at anytime)")
     valid = False
     while not valid:
-        print("Welcome to Gomoku, enter q to quit at anytime")
         print("Enter size of board")
         try:
             rows = input("Enter number of rows (5-100): ")
@@ -244,7 +244,7 @@ def get_input():
                 valid = True
                 board = Board(rows, cols)
             else:
-                print("Invalid input, try again")
+                print("Invalid size, try again")
         print()
 
     valid = False
