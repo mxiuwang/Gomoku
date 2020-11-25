@@ -114,6 +114,10 @@ class Player:
 
     def askMove(self, board):
         move = input("\nEnter move: ")
+        if move == 'q':
+            print("Thank you for playing")
+            exit()
+
         if len(move) >= 3:
             row, col = move.split(" ")
             try:
@@ -129,6 +133,9 @@ class Player:
         while board.positionIsValid(row, col) == False:
             print("Invalid move")
             move = input("\nEnter move: ")
+            if move == 'q':
+                print("Thank you for playing")
+                exit()
             if len(move) >= 3:
                 row, col = move.split(" ")
                 try:
@@ -144,11 +151,21 @@ class Player:
 def get_input():
     valid = False
     while not valid:
+        print("Welcome to Gomoku, enter q to quit at anytime")
         print("Enter size of board")
         try:
-            rows = int(input("Enter number of rows (5-100): "))
-            cols = int(input("Enter number of cols (5-100): "))
-        except:
+            rows = input("Enter number of rows (5-100): ")
+            if rows == 'q':
+                print("Thank you for playing")
+                exit()
+            rows = int(rows)
+
+            cols = input("Enter number of cols (5-100): ")
+            if cols == 'q':
+                print("Thank you for playing")
+                exit()
+            cols = int(cols)
+        except Exception:
             print("Invalid input, try again")
         else:
             if rows >= 5 and rows <= 100 and cols >= 5 and cols <= 100:
@@ -161,6 +178,9 @@ def get_input():
     valid = False
     while not valid:
         option = input("Enter game mode 1,2,3 (1 = player vs player, 2 = player vs ai, 3 = ai vs ai): ")
+        if option == 'q':
+            print("Thank you for playing")
+            exit()
         if option in ["1", "2", "3"]:
             valid = True
             player1 = Player("X", option != "3")
@@ -173,6 +193,10 @@ def get_input():
         valid = False
         while not valid:
             player = input("Would you like to be player '1' or '2': ")
+            if player == 'q':
+                print("Thank you for playing")
+                exit()
+
             if player == "1":
                 valid = True
             elif player == "2":
