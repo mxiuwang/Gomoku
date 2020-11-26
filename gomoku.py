@@ -120,6 +120,10 @@ def absearch(board, color):
     bestScore = -999
     bestMove = [0,0]
 
+    count = 0
+
+    next_moves = []
+
     # color is switched to go from Max to Min turn 
     if color == "X":
         next_color = "O"
@@ -134,13 +138,23 @@ def absearch(board, color):
         for col in range(max(0, preCol-4), min(cols, preCol+5)):
             if board.getColor(row, col) == '.':
                 board.setColorAtPosition(row, col, color, False) # AI makes potential next move 
-                score = minimax(board, isMaximizing, next_color, 0) # calls minimax with the next color 
+                score = minimax(board, isMaximizing, next_color, 0, next_moves) # calls minimax with the next color 
                 board.setColorAtPosition(row, col, ".", False) # undo the move
                 if score > bestScore:
                     bestScore = score
                     bestMove = [row, col]
                     if bestScore >= 0:
                         return bestMove
+                if count == 0 and score == -1:
+                    for move in next_moves:
+                        next_row = move[0]
+                        next_col = move[1]
+                        board.setColorAtPosition(next_row, next_col, color, False)
+                        score = minimax(board, isMaximizing, next_color, 0, next_moves)
+                        board.setColorAtPosition(next_row, next_col, ".", False)
+                        if score > bestScore:
+                            return next_row, next_col
+                count += 1
 
     # in case of no valid moves within 4 squares of last move
     if bestScore == -999:
@@ -148,13 +162,13 @@ def absearch(board, color):
             for col in range(cols):
                 if board.getColor(row, col) == '.':
                     board.setColorAtPosition(row, col, color, False)
-                    score = minimax(board, isMaximizing, next_color, 0)
+                    score = minimax(board, isMaximizing, next_color, 0, moves)
                     board.setColorAtPosition(row, col, ".", False)
                     return score
 
     return bestMove 
 
-def minimax(board, isMaximizing, color, depth):
+def minimax(board, isMaximizing, color, depth, moves):
     rows, cols = board.getBoardSize()
     preRow, preCol = board.getPrevious()
 
@@ -189,7 +203,7 @@ def minimax(board, isMaximizing, color, depth):
         for col in range(max(0, preCol-4), min(cols, preCol+5)):
             if board.getColor(row, col) == '.':
                 board.setColorAtPosition(row, col, color, False)
-                score = minimax(board, not isMaximizing, next_color, depth+1)
+                score = minimax(board, not isMaximizing, next_color, depth+1, moves)
                 board.setColorAtPosition(row, col, ".", False)
                 if isMaximizing:
                     if score > bestScore:
@@ -200,6 +214,8 @@ def minimax(board, isMaximizing, color, depth):
                     if score < bestScore:
                         bestScore = score
                         if bestScore == -1:
+                            if (row, col) not in moves:
+                                moves.append((row, col))
                             return bestScore
     return bestScore
 
