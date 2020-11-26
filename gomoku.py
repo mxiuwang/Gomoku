@@ -1,4 +1,5 @@
 import copy
+import time
 
 # source: https://www.youtube.com/watch?v=trKjYdBASyQ&vl=en&ab_channel=TheCodingTrain
 SCORES = {
@@ -45,7 +46,7 @@ class Board:
 
         print('\n')
 
-    def get_color(self, row, col):
+    def getColor(self, row, col):
         return self.__board[row][col]
 
     def setColorAtPosition(self, row, col, color):
@@ -69,8 +70,8 @@ class Board:
                     return True
 
         # check if there's 5 in a column
-        for col in range(self.__cols):
-            for row in range(self.__rows-4):
+        for row in range(self.__rows-4):
+            for col in range(self.__cols):
                 if self.__board[row][col] == self.__board[row+1][col] == self.__board[row+2][col] == self.__board[row+3][col] == self.__board[row+4][col] != '.':
                     self.__winner = self.__board[row][col]
                     return True
@@ -106,63 +107,80 @@ class Board:
         return (self.__rows, self.__cols)
 
 def absearch(board, color):
-    board_copy = copy.deepcopy(board) # copy board 
-    rows, cols = board_copy.getBoardSize()
+    rows, cols = board.getBoardSize()
     bestScore = -999
     bestMove = [0,0]
 
+    if color == "X":
+        next_color = "O"
+    else:
+        next_color = "X"
+
     # temp variables 
-    depth = 0 # depth of search tree 
     isMaximizing = False # True for max, False for min 
 
-    for row in range(0, rows):
-        for col in range(0, cols):
-            if board_copy.getBoard()[row][col] == '.':
-                score = minimax(board_copy, depth, isMaximizing, color)
+    for row in range(rows):
+        for col in range(cols):
+            if board.getColor(row, col) == '.':
+                board.setColorAtPosition(row, col, color)
+                score = minimax(board, isMaximizing, next_color, 0)
+                board.setColorAtPosition(row, col, ".")
                 if score > bestScore:
+                    bestScore = score
                     bestMove = [row, col]
+                    if bestScore >= 0:
+                        return bestMove
 
     return bestMove 
 
-def minimax(board, depth, isMaximizing, color):
+def minimax(board, isMaximizing, color, depth):
     rows, cols = board.getBoardSize()
 
+    if depth >= 4:
+        return 0
+
     bestScore = 0
-    gameOver = board.isGameOver()
-    if gameOver == True:
+    if board.isGameOver():
         winner = board.getWinner()
-        bestScore = SCORES[winner]
-        return bestScore 
+        if winner == color:
+            bestScore = 1
+        elif winner == "T":
+            bestScore = 0
+        else:
+            bestScore = -1
+        return bestScore
+
+    if color == "X":
+        next_color = "O"
+    else:
+        next_color = "X"
 
     if isMaximizing:
         bestScore = -999
-        for row in range(0, rows):
-            for col in range(0, cols):
-                if board.getBoard()[row][col] == '.':
+        for row in range(rows):
+            for col in range(cols):
+                if board.getColor(row, col) == '.':
                     board.setColorAtPosition(row, col, color)
-                    if color == 'X':
-                        color = 'O'
-                    elif color == 'O':
-                        color = 'X'    
-                    score = minimax(board, depth+1, False, color)
+                    score = minimax(board, False, next_color, depth+1)
+                    board.setColorAtPosition(row, col, ".")
                     if score > bestScore:
-                        bestScore = score 
+                        bestScore = score
+                        if bestScore >= 1:
+                            return bestScore
         # print("Maximizing", bestScore)
         return bestScore
-
     else: # isMaximizing is False 
         bestScore = 999
-        for row in range(0, rows):
-            for col in range(0, cols):
-                if board.getBoard()[row][col] == '.':
-                    board.setColorAtPosition(row, col, color)
-                    if color == 'X':
-                        color = 'O'
-                    elif color == 'O':
-                        color = 'X'    
-                    score = minimax(board, depth+1, True, color)
+        for row in range(rows):
+            for col in range(cols):
+                if board.getColor(row, col) == '.':
+                    board.setColorAtPosition(row, col, color) 
+                    score = minimax(board, True, next_color, depth+1)
+                    board.setColorAtPosition(row, col, ".")
                     if score < bestScore:
-                        bestScore = score 
+                        bestScore = score
+                        if bestScore == -1:
+                            return bestScore
         # print("Minimizing", bestScore)
         return bestScore
 
@@ -186,7 +204,7 @@ class Player:
         return row, col
 
     def askMove(self, board):
-        move = input("\nEnter move 'row# col#': ")
+        move = input("Enter move 'row# col#': ")
         if move == 'q':
             print("Thank you for playing")
             exit()
@@ -201,7 +219,7 @@ class Player:
 
         while not board.positionIsValid(row, col):
             print("Invalid move")
-            move = input("\nEnter move 'row# col#': ")
+            move = input("Enter move 'row# col#': ")
             if move == 'q':
                 print("Thank you for playing")
                 exit()
@@ -291,7 +309,7 @@ class Game:
         current = self.player1
         self.board.printBoard()
         while not self.board.isGameOver():
-            print("{0} to make move".format(current.getColor()))
+            print("{0} to make move\n".format(current.getColor()))
             current.makeMove(self.board)
             if current == self.player1:
                 current = self.player2
@@ -308,3 +326,5 @@ if __name__ == "__main__":
     game = Game(board, player1, player2)
     winner = game.play()
     print("The Winner is", winner)
+
+    input("Enter to escape")
