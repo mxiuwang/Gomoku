@@ -165,7 +165,7 @@ def minimax(board, isMaximizing, color, depth):
                     board.setColorAtPosition(row, col, ".")
                     if score > bestScore:
                         bestScore = score
-                        if bestScore >= 1:
+                        if bestScore >= 0:
                             return bestScore
         # print("Maximizing", bestScore)
         return bestScore
