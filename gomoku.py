@@ -210,22 +210,11 @@ class Player:
         return row, col
 
     def askMove(self, board):
-        move = input("Enter move 'row# col#': ")
-        if move == 'q':
-            print("Thank you for playing")
-            exit()
+        row = 101 # out of range
+        col = 101
 
-        # input validation 
-        try:
-            row, col = move.split(" ")
-            row = int(row)
-            col = int(col)
-        except:
-            row = 101 # "out of range"
-            col = 101
-
+        # input validation
         while not board.positionIsValid(row, col):
-            print("Invalid move")
             move = input("Enter move 'row# col#': ")
             if move == 'q':
                 print("Thank you for playing")
@@ -234,9 +223,12 @@ class Player:
                 row, col = move.split(" ")
                 row = int(row)
                 col = int(col)
+                if not board.positionIsValid(row, col):
+                    raise Exception
             except:
                 row = 101
                 col = 101
+                print("Invalid move")
 
         print()
         return row, col
