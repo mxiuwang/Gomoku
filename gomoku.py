@@ -5,7 +5,12 @@ import time
 
 class Board:
 
-    def __init__(self, rows, cols):
+    def __init__(self, rows, cols, board = 0):
+        if board != 0:
+            self.__rows = rows
+            self.__cols = cols
+            self.__board = board
+            return
         self.__rows = rows
         self.__cols = cols
         self.__board = []
@@ -106,8 +111,26 @@ class Board:
     def getBoardSize(self):
         return (self.__rows, self.__cols)
 
-def absearch(board, color):
-    rows, cols = board.getBoardSize()
+def absearch(oldBoard, color, prerow, precol):
+    rows, cols = oldBoard.getBoardSize()
+
+    newBoard = []
+    i = 0
+    for row in range(max(0, prerow-4), min(rows, prerow+5)):
+        j = 0
+        newrow = []
+        for col in range(max(0, precol-4), min(rows, precol+5)):
+            newrow.append(oldBoard.getColor(row, col))
+            j += 1
+        newBoard.append(newrow)
+        i += 1
+
+    newrows = len(newBoard)
+    newcols = len(newBoard[0])
+
+    board = Board(newrows, newcols, newBoard)
+    board.printBoard()
+
     bestScore = -999
     bestMove = [0,0]
 
@@ -203,10 +226,12 @@ class Player:
 
     # decide if human or AI makes move 
     def decideMove(self, board):
+        prerow, precol = 0, 0
         if self.is_human:
             row, col = self.askMove(board)
         else:
-            row, col = absearch(board, self.color) # AI move 
+            row, col = absearch(board, self.color, prerow, precol) # AI move
+        prerow, precol = row,col
         return row, col
 
     def askMove(self, board):
