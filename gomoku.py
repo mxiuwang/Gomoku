@@ -2,11 +2,6 @@ import copy
 import time
 
 # source: https://www.youtube.com/watch?v=trKjYdBASyQ&vl=en&ab_channel=TheCodingTrain
-SCORES = {
-    'X':1,
-    'O':-1,
-    'T':0
-}
 
 class Board:
 
@@ -257,7 +252,7 @@ def get_input():
         except Exception:
             print("Invalid input, try again")
         else:
-            if rows >= 5 and rows <= 100 and cols >= 5 and cols <= 100:
+            if rows >= 5 and rows <= 20 and cols >= 5 and cols <= 20:
                 valid = True
                 board = Board(rows, cols)
             else:
