@@ -1,7 +1,7 @@
 import copy
 import time
 
-# source: https://www.youtube.com/watch?v=trKjYdBASyQ&vl=en&ab_channel=TheCodingTrain
+# Reference: https://www.youtube.com/watch?v=trKjYdBASyQ&vl=en&ab_channel=TheCodingTrain
 
 class Board:
 
@@ -16,6 +16,7 @@ class Board:
             self.__board.append(row)
         self.__winner = 'T' # can be X, O or T
 
+    # returns the 2D array which contains the board 
     def getBoard(self):
         return self.__board
 
@@ -44,14 +45,17 @@ class Board:
     def getColor(self, row, col):
         return self.__board[row][col]
 
+    # sets color at a specific spot 
     def setColorAtPosition(self, row, col, color):
         self.__board[row][col] = color
 
+    # checks if a specific position is valid 
     def positionIsValid(self, row, col):
         if row<0 or row>=self.__rows or col<0 or col>=self.__cols:
             return False
         return self.__board[row][col] == "."
 
+    # returns the winner color (X, O or T)
     def getWinner(self):
         return self.__winner
 
@@ -86,7 +90,7 @@ class Board:
                     self.__winner = self.__board[row][col]
                     return True
 
-        # check if board is full
+        # check if board is full (Tie)
         fullBoard = True
         for row in range(self.__rows):
             for col in range(self.__cols):
@@ -98,6 +102,7 @@ class Board:
 
         return False   
 
+    # returns a tuple of the number of rows and cols
     def getBoardSize(self):
         return (self.__rows, self.__cols)
 
@@ -106,20 +111,21 @@ def absearch(board, color):
     bestScore = -999
     bestMove = [0,0]
 
+    # color is switched to go from Max to Min turn 
     if color == "X":
         next_color = "O"
     else:
         next_color = "X"
 
-    # temp variables 
-    isMaximizing = False # True for max, False for min 
+    # True for max, False for min 
+    isMaximizing = False 
 
     for row in range(rows):
         for col in range(cols):
             if board.getColor(row, col) == '.':
-                board.setColorAtPosition(row, col, color)
-                score = minimax(board, isMaximizing, next_color, 0)
-                board.setColorAtPosition(row, col, ".")
+                board.setColorAtPosition(row, col, color) # AI makes potential next move 
+                score = minimax(board, isMaximizing, next_color, 0) # recursively calls minimax with the next color 
+                board.setColorAtPosition(row, col, ".") # undo the move to save some memory 
                 if score > bestScore:
                     bestScore = score
                     bestMove = [row, col]
@@ -131,9 +137,11 @@ def absearch(board, color):
 def minimax(board, isMaximizing, color, depth):
     rows, cols = board.getBoardSize()
 
+    # limit search depth to 4 moves in the future (to limit running time)
     if depth >= 4:
         return 0
 
+    # score = 1 if max wins, -1 if min wins, 0 if tie 
     bestScore = 0
     if board.isGameOver():
         winner = board.getWinner()
@@ -145,11 +153,13 @@ def minimax(board, isMaximizing, color, depth):
             bestScore = -1
         return bestScore
 
+    # switch color for every recursive call 
     if color == "X":
         next_color = "O"
     else:
         next_color = "X"
 
+    # handle Max case 
     if isMaximizing:
         bestScore = -999
         for row in range(rows):
@@ -162,8 +172,9 @@ def minimax(board, isMaximizing, color, depth):
                         bestScore = score
                         if bestScore >= 0:
                             return bestScore
-        # print("Maximizing", bestScore)
         return bestScore
+    
+    # handle Min case 
     else: # isMaximizing is False 
         bestScore = 999
         for row in range(rows):
@@ -176,7 +187,6 @@ def minimax(board, isMaximizing, color, depth):
                         bestScore = score
                         if bestScore == -1:
                             return bestScore
-        # print("Minimizing", bestScore)
         return bestScore
 
     return bestScore
@@ -191,11 +201,12 @@ class Player:
         row, col = self.decideMove(board)
         board.setColorAtPosition(row, col, self.color)
 
+    # decide if human or AI makes move 
     def decideMove(self, board):
         if self.is_human:
             row, col = self.askMove(board)
         else:
-            row, col = absearch(board, self.color)
+            row, col = absearch(board, self.color) # AI move 
         return row, col
 
     def askMove(self, board):
@@ -204,12 +215,13 @@ class Player:
             print("Thank you for playing")
             exit()
 
+        # input validation 
         try:
             row, col = move.split(" ")
             row = int(row)
             col = int(col)
         except:
-            row = 101
+            row = 101 # "out of range"
             col = 101
 
         while not board.positionIsValid(row, col):
@@ -252,13 +264,14 @@ def get_input():
         except Exception:
             print("Invalid input, try again")
         else:
-            if rows >= 5 and rows <= 20 and cols >= 5 and cols <= 20:
+            if rows >= 5 and rows <= 20 and cols >= 5 and cols <= 20: # board size limited between 5 and 20
                 valid = True
                 board = Board(rows, cols)
             else:
                 print("Invalid size, try again")
         print()
 
+    # choose game size, start game
     valid = False
     while not valid:
         option = input("Enter game mode 1,2,3 (1 = player vs player, 2 = player vs ai, 3 = ai vs ai): ")
@@ -293,6 +306,7 @@ def get_input():
 
     return board, player1, player2
 
+# Game object that gets played by 2 players 
 class Game:
 
     def __init__(self, board, player1, player2):
@@ -305,8 +319,8 @@ class Game:
         self.board.printBoard()
         while not self.board.isGameOver():
             print("{0} to make move\n".format(current.getColor()))
-            current.makeMove(self.board)
-            if current == self.player1:
+            current.makeMove(self.board) 
+            if current == self.player1: # switch turns 
                 current = self.player2
             else:
                 current = self.player1
@@ -315,6 +329,7 @@ class Game:
         winner = self.board.getWinner() # X, O, or T
         return winner
 
+# driver code 
 if __name__ == "__main__":
     board, player1, player2 = get_input()
 
