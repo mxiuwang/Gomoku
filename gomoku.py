@@ -9,6 +9,8 @@ class Board:
         self.__rows = rows
         self.__cols = cols
         self.__board = []
+        self.__preRow = 0
+        self.__preCol = 0
         for row in range(rows):
             row = []
             for col in range(cols):
@@ -46,8 +48,11 @@ class Board:
         return self.__board[row][col]
 
     # sets color at a specific spot 
-    def setColorAtPosition(self, row, col, color):
+    def setColorAtPosition(self, row, col, color, update):
         self.__board[row][col] = color
+        if update:
+            self.__preRow = row
+            self.__preCol = col
 
     # checks if a specific position is valid 
     def positionIsValid(self, row, col):
@@ -106,6 +111,9 @@ class Board:
     def getBoardSize(self):
         return (self.__rows, self.__cols)
 
+    def getPrevious(self):
+        return self.__preRow, self.__preCol
+
 def absearch(board, color):
     rows, cols = board.getBoardSize()
     bestScore = -999
@@ -123,9 +131,9 @@ def absearch(board, color):
     for row in range(rows):
         for col in range(cols):
             if board.getColor(row, col) == '.':
-                board.setColorAtPosition(row, col, color) # AI makes potential next move 
+                board.setColorAtPosition(row, col, color, False) # AI makes potential next move 
                 score = minimax(board, isMaximizing, next_color, 0) # recursively calls minimax with the next color 
-                board.setColorAtPosition(row, col, ".") # undo the move to save some memory 
+                board.setColorAtPosition(row, col, ".", False) # undo the move to save some memory 
                 if score > bestScore:
                     bestScore = score
                     bestMove = [row, col]
@@ -136,6 +144,7 @@ def absearch(board, color):
 
 def minimax(board, isMaximizing, color, depth):
     rows, cols = board.getBoardSize()
+    preRow, preCol = board.getPrevious()
 
     # limit search depth to 4 moves in the future (to limit running time)
     if depth >= 4:
@@ -162,12 +171,12 @@ def minimax(board, isMaximizing, color, depth):
     # handle Max case 
     if isMaximizing:
         bestScore = -999
-        for row in range(rows):
-            for col in range(cols):
+        for row in range(max(0, preRow-4), min(rows, preRow+5)):
+            for col in range(max(0, preCol-4), min(cols, preCol+5)):
                 if board.getColor(row, col) == '.':
-                    board.setColorAtPosition(row, col, color)
+                    board.setColorAtPosition(row, col, color, False)
                     score = minimax(board, False, next_color, depth+1)
-                    board.setColorAtPosition(row, col, ".")
+                    board.setColorAtPosition(row, col, ".", False)
                     if score > bestScore:
                         bestScore = score
                         if bestScore >= 0:
@@ -177,12 +186,12 @@ def minimax(board, isMaximizing, color, depth):
     # handle Min case 
     else: # isMaximizing is False 
         bestScore = 999
-        for row in range(rows):
-            for col in range(cols):
+        for row in range(max(0, preRow-4), min(rows, preRow+5)):
+            for col in range(max(0, preCol-4), min(cols, preCol+5)):
                 if board.getColor(row, col) == '.':
-                    board.setColorAtPosition(row, col, color) 
+                    board.setColorAtPosition(row, col, color, False) 
                     score = minimax(board, True, next_color, depth+1)
-                    board.setColorAtPosition(row, col, ".")
+                    board.setColorAtPosition(row, col, ".", False)
                     if score < bestScore:
                         bestScore = score
                         if bestScore == -1:
@@ -199,7 +208,7 @@ class Player:
 
     def makeMove(self, board):
         row, col = self.decideMove(board)
-        board.setColorAtPosition(row, col, self.color)
+        board.setColorAtPosition(row, col, self.color, True)
 
     # decide if human or AI makes move 
     def decideMove(self, board):
@@ -242,13 +251,13 @@ def get_input():
     while not valid:
         print("Enter size of board")
         try:
-            rows = input("Enter number of rows (5-100): ")
+            rows = input("Enter number of rows (5-20): ")
             if rows == 'q':
                 print("Thank you for playing")
                 exit()
             rows = int(rows)
 
-            cols = input("Enter number of cols (5-100): ")
+            cols = input("Enter number of cols (5-20): ")
             if cols == 'q':
                 print("Thank you for playing")
                 exit()
