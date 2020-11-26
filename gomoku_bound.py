@@ -124,7 +124,7 @@ def absearch(board, color, preRow, preCol):
         for col in range((preCol-4)%rows, (preCol+5)%cols):
             if board.getColor(row, col) == '.':
                 board.setColorAtPosition(row, col, color) # AI makes potential next move 
-                score = minimax(board, isMaximizing, next_color, 0, Row, Col) # recursively calls minimax with the next color 
+                score = minimax(board, isMaximizing, next_color, 0, row, col) # recursively calls minimax with the next color 
                 board.setColorAtPosition(row, col, ".") # undo the move to save some memory 
                 if score > bestScore:
                     bestScore = score
