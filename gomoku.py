@@ -214,6 +214,9 @@ def minimax(board, isMaximizing, color, depth):
 
     return bestScore
 
+prerow = 0
+precol = 0
+
 class Player:
 
     def __init__(self, color, is_human):
@@ -226,12 +229,13 @@ class Player:
 
     # decide if human or AI makes move 
     def decideMove(self, board):
-        prerow, precol = 0, 0
+        global prerow
+        global precol
         if self.is_human:
             row, col = self.askMove(board)
         else:
             row, col = absearch(board, self.color, prerow, precol) # AI move
-        prerow, precol = row,col
+        prerow, precol = row, col
         return row, col
 
     def askMove(self, board):
