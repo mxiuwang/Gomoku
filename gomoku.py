@@ -186,7 +186,7 @@ class Player:
         return row, col
 
     def askMove(self, board):
-        move = input("\nEnter move [row col]: ")
+        move = input("\nEnter move 'row# col#': ")
         if move == 'q':
             print("Thank you for playing")
             exit()
@@ -199,9 +199,9 @@ class Player:
             row = 101
             col = 101
 
-        while board.positionIsValid(row, col) == False:
+        while not board.positionIsValid(row, col):
             print("Invalid move")
-            move = input("\nEnter move [row col]: ")
+            move = input("\nEnter move 'row# col#': ")
             if move == 'q':
                 print("Thank you for playing")
                 exit()
@@ -214,7 +214,10 @@ class Player:
                 col = 101
 
         print()
-        return int(row), int(col)
+        return row, col
+
+    def getColor(self):
+        return self.color
 
 def get_input():
     print("Welcome to Gomoku (Enter 'q' to quit at anytime)")
@@ -285,19 +288,15 @@ class Game:
         self.player2 = player2
 
     def play(self):
-        current = "Player 1"
-        current_player = self.player1
+        current = self.player1
         self.board.printBoard()
         while not self.board.isGameOver():
-            print("{0} to make move".format(current))
-            current_player.makeMove(self.board)
-            #winner = self.board.winner()
-            if current_player == self.player1:
-                current_player = self.player2
-                current = "Player 2"
+            print("{0} to make move".format(current.getColor()))
+            current.makeMove(self.board)
+            if current == self.player1:
+                current = self.player2
             else:
-                current_player = self.player1
-                current = "Player 1"
+                current = self.player1
             self.board.printBoard()
 
         winner = self.board.getWinner() # X, O, or T
